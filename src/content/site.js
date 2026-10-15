@@ -5,7 +5,7 @@
 
 export const site = {
   // PLACEHOLDER: your name as it should appear at the top of the page.
-  name: "Your Name",
+  name: "Zehao Cao",
 
   // PLACEHOLDER: one short line under your name.
   tagline: "Student and developer, in the middle of becoming something new.",
