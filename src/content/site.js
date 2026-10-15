@@ -28,8 +28,8 @@ export const site = {
 
     // PLACEHOLDER: replace the addresses, or delete a line you don't want.
     links: [
-      { label: "GitHub", url: "https://github.com/your-username" },
-      { label: "LinkedIn", url: "https://www.linkedin.com/in/your-username" },
+      { label: "GitHub", url: "https://github.com/salviasinjune" },
+      { label: "LinkedIn", url: "https://www.linkedin.com/in/zehao-cao" },
     ],
   },
 };
