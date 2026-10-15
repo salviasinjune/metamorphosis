@@ -1,0 +1,377 @@
+/* Colors are set by the scroll animation (see hooks/useMetamorphosis.js).
+   These are only the starting values. */
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --muted: color-mix(in srgb, var(--fg) 66%, var(--bg));
+  --rule: color-mix(in srgb, var(--fg) 30%, var(--bg));
+  --gutter: clamp(1.25rem, 6vw, 5rem);
+  --header-h: 3.5rem;
+  --display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --text: "Hanken Grotesk Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--text);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Creature layer ─────────────────────────────── */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.creature {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.creature path,
+.creature line,
+.creature circle,
+.creature ellipse {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.creature .solid {
+  fill: var(--bg);
+}
+
+.creature .ink {
+  fill: var(--fg);
+}
+
+/* On wide screens the content sits on the left and the creature on the right. */
+@media (min-width: 1100px) {
+  .stage {
+    left: calc(var(--gutter) + 35rem);
+  }
+}
+
+/* On phones and small tablets the creature gets the top of the screen. */
+@media (max-width: 1099px) {
+  .stage {
+    height: 62svh;
+  }
+}
+
+/* ── Header ─────────────────────────────────────── */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  padding: 0.85rem var(--gutter);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: 0.9375rem;
+}
+
+.site-header a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.brand {
+  font-family: var(--display);
+  font-size: 1.125rem;
+  font-weight: 450;
+}
+
+.site-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-right: auto;
+}
+
+.site-header nav a {
+  color: var(--muted);
+  padding: 0.15rem 0;
+}
+
+.site-header nav a:hover {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.mode-button {
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--rule);
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+.mode-button:hover {
+  border-color: var(--fg);
+}
+
+@media (max-width: 1099px) {
+  .site-header nav {
+    order: 3;
+    flex-basis: 100%;
+    margin-right: 0;
+    gap: 0.2rem 0.9rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ── Accessibility helpers ──────────────────────── */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 30;
+  padding: 0.5rem 0.9rem;
+  background: var(--fg);
+  color: var(--bg);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* ── Sections ───────────────────────────────────── */
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+.panel {
+  min-height: 90svh;
+  display: flex;
+  align-items: center;
+  padding: 6.5rem var(--gutter) 3rem;
+  scroll-margin-top: 0;
+}
+
+.panel-hero {
+  min-height: 100svh;
+}
+
+.panel-last {
+  min-height: 80svh;
+}
+
+.panel-inner {
+  width: 100%;
+  max-width: 34rem;
+}
+
+.panel-hero .panel-inner {
+  max-width: 38rem;
+}
+
+/* On phones and small tablets the text sits on a soft panel so it stays readable over the drawing. */
+@media (max-width: 1099px) {
+  .panel {
+    padding-top: 7rem;
+  }
+
+  .panel-inner {
+    padding: 1.25rem;
+    margin-inline: -1.25rem;
+    width: calc(100% + 2.5rem);
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+
+  .panel-hero {
+    align-items: flex-end;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* ── Type ───────────────────────────────────────── */
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--display);
+  font-weight: 350;
+  line-height: 1.08;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(3.25rem, 9vw, 6.5rem);
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+}
+
+h2 {
+  font-size: clamp(2.1rem, 4.6vw, 3.25rem);
+  letter-spacing: -0.015em;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+h4 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+p {
+  margin: 0 0 1rem;
+  max-width: 62ch;
+}
+
+.tagline {
+  font-size: 1.25rem;
+  line-height: 1.45;
+  margin-top: 1.5rem;
+  max-width: 28rem;
+}
+
+.hint,
+.meta,
+.footnote {
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.meta {
+  margin-bottom: 0.4rem;
+}
+
+.footnote {
+  margin-top: 3rem;
+}
+
+/* ── Lists of projects, courses and résumé items ── */
+
+.entries {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.entry {
+  border-top: 1px solid var(--rule);
+  padding: 1.25rem 0 0.5rem;
+}
+
+.entry:last-child {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.75rem;
+}
+
+.entry p:last-child {
+  margin-bottom: 0.5rem;
+}
+
+.group-title {
+  font-size: 1.05rem;
+  font-family: var(--text);
+  font-weight: 600;
+  margin: 2.25rem 0 0.75rem;
+}
+
+.group-title:first-of-type {
+  margin-top: 0;
+}
+
+/* ── Links ──────────────────────────────────────── */
+
+.text-link {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-thickness: 1px;
+}
+
+.text-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.button-link {
+  display: inline-block;
+  color: var(--bg);
+  background: var(--fg);
+  border: 1px solid var(--fg);
+  padding: 0.7rem 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.button-link:hover {
+  color: var(--fg);
+  background: transparent;
+}
+
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
