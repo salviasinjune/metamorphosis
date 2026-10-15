@@ -1,15 +1,212 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="Portfolio of projects, coursework and experience." />
-    <meta name="color-scheme" content="dark light" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>Portfolio</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arknights: CN vs Global Event Tracker</title>
+<style>
+:root{--bg:#f6f6f4;--fg:#1c1c1e;--mut:#6b6b70;--card:#fff;--line:#d9d9d6;--story:#2f6fdb;--celebration:#c27a0e;--collab:#c43d7a;--rerun:#2c9a6b;--other:#7a5fd0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141417;--fg:#ececf0;--mut:#9a9aa3;--card:#1e1e23;--line:#34343b;--story:#6ea0ff;--celebration:#f2b04a;--collab:#ee7bb0;--rerun:#5ed1a0;--other:#a994ee}}
+:root[data-theme="dark"]{--bg:#141417;--fg:#ececf0;--mut:#9a9aa3;--card:#1e1e23;--line:#34343b;--story:#6ea0ff;--celebration:#f2b04a;--collab:#ee7bb0;--rerun:#5ed1a0;--other:#a994ee}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:1100px;margin-inline:auto}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--mut);margin:0 0 14px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+#editbar{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:inherit;font-size:13px;background:color-mix(in srgb,var(--card) 88%,transparent);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.btn.primary{background:var(--story);color:#fff;border-color:transparent}
+.btn.danger{color:#e5484d;border-color:#e5484d}
+.btn:disabled{opacity:.5;cursor:default}
+.flt{position:relative;z-index:5}
+.flt details{display:inline-block}
+.flt summary{cursor:pointer;list-style:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;background:color-mix(in srgb,var(--card) 88%,transparent);font-size:14px;user-select:none}
+.flt summary::-webkit-details-marker{display:none}
+.flt summary::after{content:" \25BE"}
+.flt .menu{position:absolute;top:100%;left:0;margin-top:4px;min-width:230px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+.flt label{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:14px}
+.flt .dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.flt .ct{margin-left:auto;color:var(--mut);font-size:12px}
+.flt .btns{display:flex;gap:8px;margin-top:8px}
+.flt .btns button{font:inherit;font-size:12px;background:none;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:2px 10px;cursor:pointer}
+.scroll{overflow:hidden;background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);border-radius:10px;padding-bottom:8px}
+.board{position:relative}
+.axis{position:relative;height:26px;border-bottom:1px solid var(--line)}
+.tick{position:absolute;top:0;bottom:-2000px;border-left:1px solid var(--line);font-size:11px;color:var(--mut);padding-left:4px;white-space:nowrap;pointer-events:none}
+.lane-title{display:inline-block;font-weight:700;font-size:13px;margin:10px 0 4px 8px;background:var(--card);padding:0 6px;z-index:3;border-radius:4px;position:relative}
+.lane{position:relative}
+.bar{position:absolute;height:22px;border-radius:5px;background:var(--c);color:#fff;font-size:11px;line-height:22px;padding:0 5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;border:2px solid transparent;box-sizing:border-box}
+.bar.sel{outline:3px solid var(--fg);z-index:2}
+.today{position:absolute;top:26px;bottom:0;width:2px;background:#e5484d;z-index:1;pointer-events:none}
+.today span{position:absolute;top:-24px;left:4px;font-size:11px;color:#e5484d;white-space:nowrap}
+#detail{margin-top:12px;background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:64px}
+.desc{margin:8px 0 4px;white-space:pre-wrap}
+.ops{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.ops>span:first-child{color:var(--mut);font-size:13px}
+.op{border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:13px}
+.card{background:color-mix(in srgb,var(--card) 92%,transparent);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:12px}
+.card h2{font-size:16px;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.grid .wide{grid-column:1/-1}
+.card label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}
+.card input,.card select,.card textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{color:var(--mut);font-size:13px;margin-top:10px}
+#status{min-height:1em}
+#detail{position:relative;overflow:hidden}
+#detail .dbody{position:relative;z-index:1}
+#detail{container-type:inline-size}
+#detail.hasart .dbody{max-width:36%;min-height:calc((70cqw + 19.6px) / 3.12 - 24px)}
+#detail .art{position:absolute;top:0;right:0;bottom:0;width:70%;background:var(--art) right center/contain no-repeat;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 14%);mask-image:linear-gradient(to right,transparent 0%,#000 14%)}
+@media(max-width:640px){#detail.hasart .dbody{max-width:none;min-height:0}#detail .art{width:100%;opacity:.3;background-size:cover;background-position:center;-webkit-mask-image:none;mask-image:none}}
+</style></head><body>
+<h1>Arknights: CN vs Global</h1>
+<p class="sub">Global runs the same events as CN, just later. An event shows on the Global timeline only once its Global dates are confirmed. Showing the past 12 months, up to today. Tap a bar for details.</p>
+<div class="toolbar"><div class="flt" id="filters"></div><div id="editbar"></div></div>
+<p class="note" id="status"></p>
+<div class="scroll" id="scroll"><div class="board" id="board"></div></div>
+<div id="detail">Loading...</div>
+
+<div class="card" id="editor" hidden>
+ <h2 id="edTitle">Add event</h2>
+ <div class="grid">
+  <label>Name<input id="fName" autocomplete="off"></label>
+  <label>Tag<select id="fType"></select></label>
+  <label>CN start<input type="date" id="fC0"></label>
+  <label>CN end<input type="date" id="fC1"></label>
+  <label>Global start (empty if not announced)<input type="date" id="fG0"></label>
+  <label>Global end<input type="date" id="fG1"></label>
+  <label class="wide">Background image link (optional)<input id="fBanner" placeholder="https://..." autocomplete="off"></label>
+  <label class="wide">Description<textarea id="fDesc" rows="3"></textarea></label>
+  <label class="wide">Operators in this event (separate with commas)<input id="fOps" placeholder="Amiya, Texas, Lappland" autocomplete="off"></label>
+ </div>
+ <div class="row"><button class="btn primary" id="edSave" type="button">Save to GitHub</button><button class="btn" id="edCancel" type="button">Cancel</button><button class="btn danger" id="edDelete" type="button" hidden>Delete event</button></div>
+ <p class="note" id="edMsg"></p>
+</div>
+
+<div class="card" id="gh" hidden>
+ <h2>GitHub connection</h2>
+ <p class="note" style="margin-top:0">Saving uses a GitHub access token. It stays in this browser only. Make a fine-grained token limited to your repository, with "Contents: Read and write".</p>
+ <div class="grid">
+  <label>Repository (owner/name)<input id="ghRepo" placeholder="your-name/your-repo" autocomplete="off"></label>
+  <label>Branch<input id="ghBranch" placeholder="main" autocomplete="off"></label>
+  <label class="wide">Token<input id="ghToken" type="password" autocomplete="off"></label>
+ </div>
+ <div class="row"><button class="btn primary" id="ghSave" type="button">Save settings</button><button class="btn" id="ghForget" type="button">Forget token</button><button class="btn" id="ghClose" type="button">Close</button></div>
+ <p class="note" id="ghMsg"></p>
+</div>
+<p class="note" id="note"></p>
+
+<script>
+const TYPES={story:"Story / Side story",celebration:"Celebration",collab:"Collab",rerun:"Rerun",other:"Other"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cssUrl=u=>String(u).replace(/[\s"'()\\<>]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpperCase().padStart(2,"0"));
+const okUrl=u=>/^(https?:\/\/|data:image\/)/i.test(u);
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,40)||"event";
+const D=s=>Date.parse(s+"T00:00:00Z")/864e5, fmt=d=>new Date(d*864e5).toISOString().slice(0,10);
+const TODAY=Math.floor(Date.now()/864e5);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const editMode=()=>store.get("akEdit")==="1";
+if(/[?&]edit\b/.test(location.search))store.set("akEdit","1");
+let START=0,END=1,PX=3,DATA={updated:"",events:[]},ev=[],LAG=0,matchedN=0,selId=null,editingId=null;
+const on=new Set(Object.keys(TYPES));
+
+function build(){
+ const m=DATA.events.filter(e=>e.global);matchedN=m.length;
+ LAG=m.length?Math.round(m.reduce((a,e)=>a+D(e.global[0])-D(e.cn[0]),0)/m.length):0;
+ ev=DATA.events.map(e=>({id:e.id,name:e.name,type:e.type,c0:D(e.cn[0]),c1:D(e.cn[1]),g0:e.global?D(e.global[0]):D(e.cn[0])+LAG,g1:e.global?D(e.global[1]):D(e.cn[1])+LAG,proj:!e.global,banner:okUrl(e.banner||"")?e.banner:"",desc:e.description||"",ops:e.operators||[]}));
+ $("note").textContent=(matchedN?`Average CN-to-Global gap across ${matchedN} matched events: ${LAG} days (about ${(LAG/30.4).toFixed(1)} months). `:"")+`Dates come from the Arknights Terra Wiki event lists and manual entries. Data last updated ${DATA.updated||"unknown"}.`}
+function fit(){START=TODAY-365;END=TODAY+1;PX=Math.max(($("scroll").clientWidth-2)/(END-START),0.05)}
+const x=d=>(d-START)*PX;
+function pack(items,k0,k1){const rows=[],pos={};items.slice().sort((a,b)=>a[k0]-b[k0]).forEach(e=>{let r=rows.findIndex(end=>e[k0]>end+1);if(r<0){r=rows.length;rows.push(0)}rows[r]=e[k1];pos[e.id]=r});return{pos,n:rows.length||1}}
+function lane(items,k0,k1,title){const p=pack(items,k0,k1);
+ let h=`<div class="lane-title">${title}</div><div class="lane" style="height:${p.n*26+4}px">`;
+ items.forEach(e=>{const l=Math.max(x(e[k0]),0),r=Math.min(x(e[k1]+1),x(END));
+  h+=`<div class="bar${selId===e.id?" sel":""}" data-id="${esc(e.id)}" title="${esc(e.name)}" style="--c:var(--${e.type});${e.banner?`color:#fff;background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('${cssUrl(e.banner)}') center/cover var(--c);`:""}left:${l}px;width:${Math.max(r-l,10)}px;top:${p.pos[e.id]*26+2}px">${esc(e.name)}</div>`});
+ return h+"</div>"}
+function draw(){const shown=ev.filter(e=>on.has(e.type));
+ const cn=shown.filter(e=>e.c1>=START&&e.c0<=END),gl=shown.filter(e=>!e.proj&&e.g1>=START&&e.g0<=END);
+ let h=`<div style="width:${x(END)}px;position:relative;overflow:hidden"><div class="axis">`;
+ const step=PX*30<46?3:1;let n=0;const s0=new Date(START*864e5);
+ for(let d=new Date(Date.UTC(s0.getUTCFullYear(),s0.getUTCMonth()+1,1));d.getTime()/864e5<END;d.setUTCMonth(d.getUTCMonth()+1),n++){h+=`<div class="tick" style="left:${x(d.getTime()/864e5)}px">${n%step?"":d.toLocaleString("en",{month:"short",year:"2-digit",timeZone:"UTC"})}</div>`}
+ h+=`</div><div class="today" style="left:${x(TODAY)}px"><span style="left:auto;right:4px;top:2px">Today</span></div>`;
+ h+=lane(cn,"c0","c1","CHINA (CN)")+lane(gl,"g0","g1","GLOBAL")+"</div>";
+ $("board").innerHTML=h}
+function detail(){const e=ev.find(v=>v.id===selId),box=$("detail");
+ if(!e){box.className="";box.textContent="Tap any bar to compare its CN and Global dates.";return}
+ const lag=Math.round(e.g0-e.c0);
+ let h=`<b>${esc(e.name)}</b> <span style="color:var(--mut)">(${esc(TYPES[e.type]||e.type)})</span><br>CN: ${fmt(e.c0)} to ${fmt(e.c1)}<br>`;
+ h+=e.proj?`Global: not announced yet${matchedN?`<br>Typical gap so far: about ${(LAG/30.4).toFixed(1)} months`:""}`:`Global: ${fmt(e.g0)} to ${fmt(e.g1)}<br>Gap: ${lag} days (about ${(lag/30.4).toFixed(1)} months)`;
+ if(e.desc)h+=`<p class="desc">${esc(e.desc)}</p>`;
+ if(e.ops.length)h+=`<div class="ops"><span>Operators:</span>${e.ops.map(o=>`<span class="op">${esc(o)}</span>`).join("")}</div>`;
+ if(!e.banner)h+='<br><i style="color:var(--mut)">No banner image saved for this event yet.</i>';
+ if(editMode())h+='<p><button class="btn" id="editThis" type="button">Edit this event</button></p>';
+ box.className=e.banner?"hasart":"";box.innerHTML=(e.banner?`<div class="art" style="--art:url('${cssUrl(e.banner)}')"></div>`:"")+`<div class="dbody">${h}</div>`;if(editMode())$("editThis").onclick=()=>openEditor(e.id)}
+function refresh(){build();buildFilters();fit();draw();detail()}
+
+/* tag filter dropdown */
+const f=$("filters");
+function sumText(){return `Filter by tag (${on.size} of ${Object.keys(TYPES).length})`}
+function buildFilters(){const open=f.querySelector("details")?.open?" open":"";f.innerHTML=`<details${open}><summary>${sumText()}</summary><div class="menu">`+Object.entries(TYPES).map(([k,v])=>`<label style="--c:var(--${k})"><input type="checkbox" data-k="${k}"${on.has(k)?" checked":""}><span class="dot"></span>${v}<span class="ct">${DATA.events.filter(e=>e.type===k).length}</span></label>`).join("")+`<div class="btns"><button type="button" data-all="1">All</button><button type="button" data-all="0">None</button></div></div></details>`}
+f.addEventListener("click",e=>{const a=e.target.dataset.all;if(a===undefined)return;a==="1"?Object.keys(TYPES).forEach(k=>on.add(k)):on.clear();buildFilters();draw()});
+f.addEventListener("change",e=>{const k=e.target.dataset.k;if(!k)return;e.target.checked?on.add(k):on.delete(k);f.querySelector("summary").textContent=sumText();draw()});
+document.addEventListener("click",e=>{const d=f.querySelector("details");if(d&&!e.composedPath().includes(f))d.open=false});
+$("board").addEventListener("click",e=>{const b=e.target.closest(".bar");if(!b)return;const id=b.dataset.id;selId=selId===id?null:id;draw();detail()});
+window.addEventListener("resize",()=>{fit();draw()});
+
+/* ---------- editing (only shown in edit mode: add ?edit to the address) ---------- */
+const show=(id,v)=>{$(id).hidden=!v};
+function say(t,bad){const el=$("editor").hidden?$("status"):$("edMsg");el.textContent=t;el.style.color=bad?"#e5484d":"var(--mut)"}
+const ghCfg=()=>({repo:(store.get("akRepo")||"").trim(),branch:(store.get("akBranch")||"main").trim()||"main",token:store.get("akToken")||""});
+const u8d=s=>new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0)));
+const u8e=s=>{let t="";new TextEncoder().encode(s).forEach(c=>t+=String.fromCharCode(c));return btoa(t)};
+const ghErr=(code,what)=>code===401?"GitHub rejected the token. It may be wrong or expired.":(code===403||code===404)?`Could not ${what} events.json in that repository. Check the repository name, and that the token has "Contents: Read and write" for it.`:(code===409||code===422)?"GitHub kept saying the file changed while saving. Wait a minute and try again.":`GitHub returned an error (${code}) while trying to ${what} events.json.`;
+async function saveToGitHub(mutate,message){
+ const s=ghCfg();if(!s.repo||!s.token)throw new Error("Add your GitHub repository and token first (GitHub settings).");
+ const url=`https://api.github.com/repos/${s.repo}/contents/events.json`,hdr={Authorization:`Bearer ${s.token}`,Accept:"application/vnd.github+json"};
+ for(let attempt=0;;attempt++){
+  const r=await fetch(`${url}?ref=${encodeURIComponent(s.branch)}&t=${Date.now()}`,{headers:hdr,cache:"no-store"});if(!r.ok)throw new Error(ghErr(r.status,"read"));
+  const file=await r.json(),cur=JSON.parse(u8d(file.content));cur.events=cur.events||[];
+  mutate(cur);cur.updated=new Date().toISOString().slice(0,10);
+  cur.events.sort((a,b)=>a.cn[0]<b.cn[0]?-1:a.cn[0]>b.cn[0]?1:0);
+  const p=await fetch(url,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},hdr),body:JSON.stringify({message,content:u8e(JSON.stringify(cur,null,1)+"\n"),sha:file.sha,branch:s.branch})});
+  if(p.ok)return cur;
+  if((p.status===409||p.status===422)&&attempt<2)continue;
+  throw new Error(ghErr(p.status,"write"))}}
+async function commit(mutate,message,okText){
+ const btns=[...document.querySelectorAll("#editor .btn")];btns.forEach(b=>b.disabled=true);say("Saving to GitHub...");
+ try{DATA=await saveToGitHub(mutate,message);refresh();show("editor",false);say(okText+" The live site updates in about a minute.")}
+ catch(e){say(e.message||"Could not save.",true)}
+ finally{btns.forEach(b=>b.disabled=false)}}
+function openEditor(id){editingId=id||null;const e=id?DATA.events.find(v=>v.id===id):null;
+ $("edTitle").textContent=e?"Edit event":"Add event";
+ $("fName").value=e?e.name:"";$("fType").value=e?e.type:"story";
+ $("fC0").value=e?e.cn[0]:"";$("fC1").value=e?e.cn[1]:"";
+ $("fG0").value=e&&e.global?e.global[0]:"";$("fG1").value=e&&e.global?e.global[1]:"";
+ $("fBanner").value=e?e.banner||"":"";$("fDesc").value=e?e.description||"":"";$("fOps").value=e?(e.operators||[]).join(", "):"";
+ $("edDelete").hidden=!e;$("edMsg").textContent="";$("status").textContent="";show("editor",true);$("fName").focus();$("editor").scrollIntoView({block:"nearest"})}
+function readForm(){return{name:$("fName").value.trim(),type:$("fType").value,c0:$("fC0").value,c1:$("fC1").value,g0:$("fG0").value,g1:$("fG1").value,banner:$("fBanner").value.trim(),description:$("fDesc").value.trim(),operators:(()=>{const seen=new Set();return $("fOps").value.split(/[,\n]/).map(s=>s.trim()).filter(s=>{const k=s.toLowerCase();if(!s||seen.has(k))return false;seen.add(k);return true})})()}}
+function validate(o){if(!o.name)return"Please enter a name.";if(!TYPES[o.type])return"Pick a tag.";if(!o.c0||!o.c1)return"Enter both CN dates.";if(o.c1<o.c0)return"The CN end date is before the start date.";if(!o.g0!==!o.g1)return"Enter both Global dates, or leave both empty if it isn't announced yet.";if(o.g0&&o.g1<o.g0)return"The Global end date is before the start date.";if(o.banner&&!okUrl(o.banner))return"The banner link must start with https://";return""}
+$("edSave").onclick=()=>{const o=readForm(),err=validate(o);if(err){say(err,true);return}
+ const obj={name:o.name,type:o.type,cn:[o.c0,o.c1],global:o.g0?[o.g0,o.g1]:null,banner:o.banner,description:o.description,operators:o.operators,manual:true};
+ if(editingId){const id=editingId;commit(cur=>{const i=cur.events.findIndex(e=>e.id===id);if(i>=0)cur.events[i]=Object.assign({},cur.events[i],obj);else cur.events.push(Object.assign({id},obj))},`Update event: ${o.name}`,"Event saved.")}
+ else{const base=`${o.c0}-${slug(o.name)}`;commit(cur=>{let u=base,n=2;while(cur.events.some(e=>e.id===u))u=`${base}-${n++}`;cur.events.push(Object.assign({id:u},obj))},`Add event: ${o.name}`,"Event added.")}};
+$("edDelete").onclick=()=>{const id=editingId,e=DATA.events.find(v=>v.id===id);if(!e||!confirm(`Delete "${e.name}"?`))return;
+ commit(cur=>{cur.events=cur.events.filter(v=>v.id!==id)},`Delete event: ${e.name}`,"Event deleted.");selId=null};
+$("editor").addEventListener("input",()=>{$("edMsg").textContent=""});
+$("edCancel").onclick=()=>{show("editor",false);say("")};
+function openGh(){const s=ghCfg();$("ghRepo").value=s.repo;$("ghBranch").value=s.branch;$("ghToken").value="";$("ghToken").placeholder=s.token?"(saved - leave empty to keep it)":"";$("ghMsg").textContent="";show("gh",true)}
+$("ghSave").onclick=()=>{const repo=$("ghRepo").value.trim(),tok=$("ghToken").value.trim();
+ if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){$("ghMsg").textContent="The repository should look like your-name/your-repo.";return}
+ store.set("akRepo",repo);store.set("akBranch",$("ghBranch").value.trim()||"main");if(tok)store.set("akToken",tok);
+ if(!ghCfg().token){$("ghMsg").textContent="Settings saved, but no token yet.";return}show("gh",false);say("GitHub settings saved.")};
+$("ghForget").onclick=()=>{store.del("akToken");$("ghToken").placeholder="";$("ghMsg").textContent="Token removed from this browser."};
+$("ghClose").onclick=()=>show("gh",false);
+function renderEditbar(){const bar=$("editbar");
+ if(!editMode()){bar.innerHTML="";show("editor",false);show("gh",false);return}
+ bar.innerHTML='<button class="btn primary" id="bAdd" type="button">+ Add event</button><button class="btn" id="bGh" type="button">GitHub settings</button><button class="btn" id="bExit" type="button">Exit edit mode</button>';
+ $("bAdd").onclick=()=>openEditor();$("bGh").onclick=openGh;
+ $("bExit").onclick=()=>{store.del("akEdit");renderEditbar();detail()}}
+
+$("fType").innerHTML=Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+fetch("events.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{DATA=j;DATA.events=DATA.events||[];refresh();renderEditbar();if(editMode()&&!ghCfg().token)openGh()})
+.catch(()=>{$("detail").textContent="Could not load events.json. Open this page from your website or a local web server, not by double-clicking the file."});
+</script></body></html>
